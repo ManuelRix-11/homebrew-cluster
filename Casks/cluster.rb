@@ -10,4 +10,17 @@ cask "cluster" do
   depends_on arch: :arm64
 
   app "Cluster.app"
+
+  # ponytail: rimozione quarantine necessaria per app senza firma Apple Developer
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-rd", "com.apple.quarantine", "#{appdir}/Cluster.app"],
+                   sudo: false
+  end
+
+  zap trash: [
+    "~/Library/Application Support/Cluster",
+    "~/Library/Logs/Cluster",
+    "~/Library/Preferences/com.cluster.desktop.plist",
+  ]
 end
