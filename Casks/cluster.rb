@@ -14,7 +14,7 @@ cask "cluster" do
   # ponytail: rimozione quarantine necessaria per app senza firma Apple Developer
   postflight_steps do
     system_command "/usr/bin/xattr",
-                   args: ["-rd", "com.apple.quarantine", "#{appdir}/Cluster.app"],
+                   args: ["-rd", "com.apple.quarantine", "/Applications/Cluster.app"],
                    sudo: false
   end
 
