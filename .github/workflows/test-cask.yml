@@ -42,3 +42,8 @@ jobs:
           else
             echo "✅ quarantine attribute rimosso correttamente"
           fi
+
+      - name: Verify app signature
+        run: |
+          codesign -vvv --deep --strict /Applications/Cluster.app
+          echo "✅ Firma ad-hoc valida e verificata"

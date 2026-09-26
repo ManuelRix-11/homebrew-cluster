@@ -11,10 +11,13 @@ cask "cluster" do
 
   app "Cluster.app"
 
-  # ponytail: rimozione quarantine necessaria per app senza firma Apple Developer
-  postflight_steps do
+  # ponytail: rimozione quarantena e firma ad-hoc locale per bypass Gatekeeper macOS
+  postflight do
     system_command "/usr/bin/xattr",
-                   args: ["-rd", "com.apple.quarantine", "/Applications/Cluster.app"],
+                   args: ["-rd", "com.apple.quarantine", "#{appdir}/Cluster.app"],
+                   sudo: false
+    system_command "/usr/bin/codesign",
+                   args: ["--force", "--deep", "--sign", "-", "#{appdir}/Cluster.app"],
                    sudo: false
   end
 
