@@ -1,0 +1,44 @@
+name: Test Cask
+
+on:
+  push:
+    paths:
+      - "Casks/cluster.rb"
+  pull_request:
+    paths:
+      - "Casks/cluster.rb"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Tappa il repo locale invece di clonare da GitHub
+      # così testiamo sempre la versione corrente del Cask
+      - name: Tap this repo (local)
+        run: brew tap ManuelRix-11/cluster "${{ github.workspace }}"
+
+      - name: Install cask
+        run: brew install --cask ManuelRix-11/cluster/cluster
+
+      - name: Verify app installed
+        run: |
+          if [ -d "/Applications/Cluster.app" ]; then
+            echo "✅ Cluster.app trovata in /Applications"
+          else
+            echo "❌ Cluster.app NON trovata in /Applications"
+            exit 1
+          fi
+
+      - name: Verify quarantine removed
+        run: |
+          attrs=$(xattr /Applications/Cluster.app 2>/dev/null || true)
+          if echo "$attrs" | grep -q "com.apple.quarantine"; then
+            echo "❌ quarantine attribute ancora presente"
+            exit 1
+          else
+            echo "✅ quarantine attribute rimosso correttamente"
+          fi
