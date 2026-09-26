@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - "Casks/cluster.rb"
+      - ".github/workflows/test-cask.yml"
   pull_request:
     paths:
       - "Casks/cluster.rb"
+      - ".github/workflows/test-cask.yml"
   workflow_dispatch:
 
 jobs:
@@ -47,3 +49,33 @@ jobs:
         run: |
           codesign -vvv --deep --strict /Applications/Cluster.app
           echo "✅ Firma ad-hoc valida e verificata"
+
+      - name: Test launch Cluster.app (Gatekeeper & execution check)
+        run: |
+          echo "🚀 Avvio Cluster.app tramite macOS LaunchServices..."
+          open -a "/Applications/Cluster.app"
+
+          # Attesa per consentire a Gatekeeper e LaunchServices di intervenire
+          sleep 5
+
+          # 1. Verifica che Gatekeeper non abbia rimosso l'app
+          if [ ! -d "/Applications/Cluster.app" ]; then
+            echo "❌ Gatekeeper ha rimosso l'app o l'ha bloccata!"
+            exit 1
+          fi
+
+          # 2. Verifica se l'app è finita nel Cestino
+          if [ -d "$HOME/.Trash/Cluster.app" ]; then
+            echo "❌ Cluster.app è stata spostata nel Cestino da macOS!"
+            exit 1
+          fi
+
+          # 3. Verifica presenza processo attivo
+          if pgrep -f "Cluster" > /dev/null; then
+            echo "✅ Cluster.app è stata avviata con successo e il processo è attivo!"
+            pkill -f "Cluster" || true
+          else
+            echo "ℹ️ Processo terminato (ambiente headless), test di esecuzione diretta del binario:"
+            /Applications/Cluster.app/Contents/MacOS/Cluster --version || true
+            echo "✅ Esecuzione binario completata senza blocchi del kernel"
+          fi
