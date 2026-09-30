@@ -1,6 +1,6 @@
 cask "cluster" do
   version "1.5.122"
-  sha256 "1a05ef51813bb87ee4fb8f492c57a9f9fd1e718ad2a9d2c201a581c71af5a00b"
+  sha256 "ff68af4068283783fd1466f088910ed00926270c517e53990a3c6722bfe2c9fc"
 
   url "https://github.com/ManuelRix-11/Cluster-Releases/releases/download/v#{version}/Cluster-#{version}-arm64.dmg"
   name "Cluster"
